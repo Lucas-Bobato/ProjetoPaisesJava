@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Países do Mundo</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  </head>
+  <body>
+    <header>
+      <h1>Países do Mundo</h1>
+    </header>
+
+    <div class="filters">
+      <div class="filter-section">
+        <h2>Filtros e Ordenação</h2>
+
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="continent-filter">Filtrar por Continente:</label>
+            <select id="continent-filter" onchange="filterByContinent()">
+              <option value="">Todos os Continentes</option>
+              <option
+                th:each="cont : ${continents}"
+                th:value="${cont}"
+                th:text="${cont.displayName}"
+                th:selected="${selectedContinent != null && selectedContinent == cont}"
+              ></option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="sort-by">Ordenar por:</label>
+            <select id="sort-by" onchange="changeSorting()">
+              <option
+                value="name"
+                th:selected="${sortBy == 'name' || sortBy == null}"
+              >
+                Nome
+              </option>
+              <option value="capital" th:selected="${sortBy == 'capital'}">
+                Capital
+              </option>
+              <option value="continent" th:selected="${sortBy == 'continent'}">
+                Continente
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <button class="reset-button" onclick="resetFilters()">
+              Resetar Filtros
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <div class="countries-container">
+        <div th:if="${countries.empty}" class="no-results">
+          <p>Nenhum país encontrado com os filtros selecionados.</p>
+        </div>
+
+        <div th:unless="${countries.empty}" class="country-cards">
+          <div class="country-card" th:each="country : ${countries}">
+            <div class="country-flag">
+              <img
+                th:src="${country.flagUrl}"
+                th:alt="'Bandeira de ' + ${country.name}"
+              />
+            </div>
+            <div class="country-info">
+              <h2 th:text="${country.name}">Nome do País</h2>
+              <p>
+                <span class="label">Capital:</span>
+                <span th:text="${country.capital}">Nome da Capital</span>
+              </p>
+              <p>
+                <span class="label">Continente:</span>
+                <span th:text="${country.continentDisplayName}"
+                  >Nome do Continente</span
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Desenvolvido com Spring Boot e Thymeleaf &copy; 2025</p>
+    </footer>
+
+    <script th:src="@{/js/script.js}"></script>
+  </body>
+</html>
