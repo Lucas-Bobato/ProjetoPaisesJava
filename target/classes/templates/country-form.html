@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${pageTitle}">Formulário do País</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+      /* Additional styles for the form page */
+      .form-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-container h2 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #555;
+      }
+
+      .form-group input[type="text"],
+      .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+
+      .form-group input[type="text"]:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #4b6cb7;
+        box-shadow: 0 0 0 2px rgba(75, 108, 183, 0.3);
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: space-between; /* Align buttons */
+        align-items: center;
+        gap: 1rem; /* Space between buttons */
+        margin-top: 2rem;
+      }
+
+      .form-actions button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        flex-grow: 1; /* Make buttons take available space */
+      }
+
+      .form-actions .submit-button {
+        background-color: #4caf50; /* Green */
+        color: white;
+      }
+      .form-actions .submit-button:hover {
+        background-color: #45a049;
+      }
+
+      .form-actions .cancel-button {
+        background-color: #f44336; /* Red */
+        color: white;
+        text-decoration: none; /* Remove underline from link-styled button */
+        text-align: center;
+        display: inline-block; /* Necessary for padding and width */
+      }
+      .form-actions .cancel-button:hover {
+        background-color: #d32f2f;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Países do Mundo</h1>
+    </header>
+
+    <div class="form-container">
+      <h2 th:text="${pageTitle}">Formulário do País</h2>
+      <form th:action="@{${formAction}}" th:object="${country}" method="post">
+        <input
+          type="hidden"
+          th:name="originalName"
+          th:if="${originalName}"
+          th:value="${originalName}"
+        />
+
+        <div class="form-group">
+          <label for="name">Nome do País:</label>
+          <input type="text" id="name" th:field="*{name}" required />
+        </div>
+
+        <div class="form-group">
+          <label for="capital">Capital:</label>
+          <input type="text" id="capital" th:field="*{capital}" required />
+        </div>
+
+        <div class="form-group">
+          <label for="continent">Continente:</label>
+          <select id="continent" th:field="*{continent}" required>
+            <option value="">Selecione um Continente</option>
+            <option
+              th:each="cont : ${continents}"
+              th:value="${cont}"
+              th:text="${cont.displayName}"
+              th:selected="${country.continent == cont}"
+            ></option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="flagUrl">URL da Bandeira:</label>
+          <input type="text" id="flagUrl" th:field="*{flagUrl}" required />
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="submit-button"
+            th:text="${originalName != null ? 'Atualizar País' : 'Adicionar País'}"
+          >
+            Salvar
+          </button>
+          <a th:href="@{/countries}" class="cancel-button">Cancelar</a>
+        </div>
+      </form>
+    </div>
+
+    <footer>
+      <p>Desenvolvido com Spring Boot e Thymeleaf &copy; 2025</p>
+    </footer>
+  </body>
+</html>

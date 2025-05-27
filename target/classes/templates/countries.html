@@ -5,6 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Países do Mundo</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+      /* Style for action buttons in the card */
+      .country-actions {
+        display: flex;
+        justify-content: space-around; /* Distribute space around items */
+        padding: 0.5rem 1.5rem 1rem; /* Add some padding */
+        gap: 0.5rem; /* Space between buttons */
+      }
+
+      .country-actions .action-button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-align: center;
+        font-size: 0.9rem;
+        flex-grow: 1; /* Allow buttons to grow and fill space */
+        max-width: 45%; /* Prevent buttons from becoming too wide on larger cards */
+      }
+
+      .edit-button {
+        background-color: #ffc107; /* Amber */
+      }
+      .edit-button:hover {
+        background-color: #e0a800;
+      }
+
+      .delete-button {
+        background-color: #f44336; /* Red */
+      }
+      .delete-button:hover {
+        background-color: #d32f2f;
+      }
+
+      /* Button to add new country */
+      .add-country-button-container {
+        text-align: right; /* Align button to the right */
+        margin-bottom: 1.5rem; /* Space below the button */
+      }
+
+      .add-country-button {
+        background-color: #28a745; /* Green */
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.2s;
+      }
+      .add-country-button:hover {
+        background-color: #218838;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -14,7 +72,6 @@
     <div class="filters">
       <div class="filter-section">
         <h2>Filtros e Ordenação</h2>
-
         <div class="filter-controls">
           <div class="filter-group">
             <label for="continent-filter">Filtrar por Continente:</label>
@@ -22,13 +79,12 @@
               <option value="">Todos os Continentes</option>
               <option
                 th:each="cont : ${continents}"
-                th:value="${cont}"
+                th:value="${cont.name()}"
                 th:text="${cont.displayName}"
                 th:selected="${selectedContinent != null && selectedContinent == cont}"
               ></option>
             </select>
           </div>
-
           <div class="filter-group">
             <label for="sort-by">Ordenar por:</label>
             <select id="sort-by" onchange="changeSorting()">
@@ -46,7 +102,6 @@
               </option>
             </select>
           </div>
-
           <div class="filter-group">
             <button class="reset-button" onclick="resetFilters()">
               Resetar Filtros
@@ -57,6 +112,12 @@
     </div>
 
     <main>
+      <div class="add-country-button-container">
+        <a th:href="@{/countries/new}" class="add-country-button"
+          >Adicionar Novo País</a
+        >
+      </div>
+
       <div class="countries-container">
         <div th:if="${countries.empty}" class="no-results">
           <p>Nenhum país encontrado com os filtros selecionados.</p>
@@ -82,6 +143,19 @@
                   >Nome do Continente</span
                 >
               </p>
+            </div>
+            <div class="country-actions">
+              <a
+                th:href="@{/countries/edit/{name}(name=${country.name})}"
+                class="action-button edit-button"
+                >Editar</a
+              >
+              <a
+                th:href="@{/countries/delete/{name}(name=${country.name})}"
+                class="action-button delete-button"
+                onclick="return confirm('Tem certeza que deseja excluir este país?');"
+                >Excluir</a
+              >
             </div>
           </div>
         </div>

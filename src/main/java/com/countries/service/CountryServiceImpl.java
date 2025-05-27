@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional; // Import Optional
 import java.util.stream.Collectors;
 
 @Service
@@ -16,13 +17,11 @@ public class CountryServiceImpl implements CountryService {
     private final List<Country> countries;
 
     public CountryServiceImpl() {
-        // Inicializa a lista de países com dados estáticos
         this.countries = new ArrayList<>();
         initializeCountries();
     }
 
     private void initializeCountries() {
-        // Adiciona países de diferentes continentes
         // América do Sul
         countries.add(new Country("Brasil", "Brasília", Continent.SOUTH_AMERICA, "https://flagcdn.com/w320/br.png"));
         countries.add(new Country("Argentina", "Buenos Aires", Continent.SOUTH_AMERICA, "https://flagcdn.com/w320/ar.png"));
@@ -95,25 +94,72 @@ public class CountryServiceImpl implements CountryService {
         return Arrays.asList(Continent.values());
     }
 
-    private void sortByField(List<Country> countries, String sortBy) {
+    private void sortByField(List<Country> countryList, String sortBy) { // Renamed parameter to avoid conflict
         if (sortBy == null) {
             return;
         }
-
         switch (sortBy.toLowerCase()) {
             case "name":
-                countries.sort(Comparator.comparing(Country::getName));
+                countryList.sort(Comparator.comparing(Country::getName));
                 break;
             case "capital":
-                countries.sort(Comparator.comparing(Country::getCapital));
+                countryList.sort(Comparator.comparing(Country::getCapital));
                 break;
             case "continent":
-                countries.sort(Comparator.comparing(Country::getContinentDisplayName));
+                countryList.sort(Comparator.comparing(Country::getContinentDisplayName));
                 break;
             default:
-                // Por padrão, ordena pelo nome
-                countries.sort(Comparator.comparing(Country::getName));
+                countryList.sort(Comparator.comparing(Country::getName));
                 break;
+        }
+    }
+
+    // --- New CRUD Method Implementations ---
+
+    @Override
+    public void addCountry(Country country) {
+        // Basic check for duplicates by name
+        if (countries.stream().noneMatch(c -> c.getName().equalsIgnoreCase(country.getName()))) {
+            countries.add(country);
+        } else {
+            // Handle duplicate name scenario, e.g., throw an exception or log a warning
+            System.err.println("Country with name " + country.getName() + " already exists.");
+        }
+    }
+
+    @Override
+    public Optional<Country> getCountryByName(String name) {
+        return countries.stream()
+                .filter(country -> country.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
+    @Override
+    public void updateCountry(String originalName, Country updatedCountry) {
+        Optional<Country> existingCountryOpt = getCountryByName(originalName);
+        if (existingCountryOpt.isPresent()) {
+            // If the name is also being updated, we need to ensure the new name isn't a duplicate
+            // (unless it's the same as the original name)
+            if (!originalName.equalsIgnoreCase(updatedCountry.getName()) && 
+                getCountryByName(updatedCountry.getName()).isPresent()) {
+                System.err.println("Cannot update to name " + updatedCountry.getName() + " as it already exists.");
+                return; // Or throw an exception
+            }
+            
+            // Remove the old entry and add the updated one
+            // This is simpler for in-memory list, especially if the "key" (name) can change
+            countries.removeIf(c -> c.getName().equalsIgnoreCase(originalName));
+            countries.add(updatedCountry);
+        } else {
+            System.err.println("Country with name " + originalName + " not found for update.");
+        }
+    }
+
+    @Override
+    public void deleteCountry(String name) {
+        boolean removed = countries.removeIf(country -> country.getName().equalsIgnoreCase(name));
+        if (!removed) {
+            System.err.println("Country with name " + name + " not found for deletion.");
         }
     }
 }
